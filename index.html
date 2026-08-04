@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Segurança Digital para Idosos</title>
+    <style>
+        /* Reset e Variáveis de Cor */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-primary: #F4F7F6;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A252C;
+            --text-secondary: #4A5568;
+            --brand-primary: #0056B3;
+            --brand-hover: #003D82;
+            --accent-warning: #C53030;
+            --accent-success: #22543D;
+            --bg-warning: #FFF5F5;
+            --bg-success: #F0FFF4;
+            --border-color: #CBD5E0;
+            --font-scale: 1;
+        }
+
+        /* Suporte ao Modo Alto Contraste via CSS puro */
+        #contrast-toggle:checked ~ div.app-wrapper {
+            --bg-primary: #000000;
+            --bg-card: #121212;
+            --text-primary: #FFFF00;
+            --text-secondary: #FFFFFF;
+            --brand-primary: #FFFF00;
+            --brand-hover: #FFD700;
+            --accent-warning: #FF4D4D;
+            --accent-success: #00FF66;
+            --bg-warning: #330000;
+            --bg-success: #003300;
+            --border-color: #FFFF00;
+        }
+
+        /* Controle do Tamanho da Fonte */
+        #font-large:checked ~ div.app-wrapper {
+            --font-scale: 1.25;
+        }
+
+        #font-xlarge:checked ~ div.app-wrapper {
+            --font-scale: 1.5;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+
+        /* Ocultar Caixas de Seleção de Controle */
+        .control-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Barra de Acessibilidade Fixa no Topo */
+        .accessibility-bar {
+            background-color: #1A252C;
+            color: #FFFFFF;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .accessibility-bar span {
+            font-size: calc(1rem * var(--font-scale));
+            font-weight: bold;
+        }
+
+        .acc-btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .acc-btn {
+            background-color: #2D3748;
+            color: #FFFFFF;
+            border: 2px solid #A0AEC0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            min-width: 48px;
+            text-decoration: none;
+        }
+
+        .acc-btn:hover, .acc-btn:focus {
+            background-color: #4A5568;
+            border-color: #FFFFFF;
+            outline: 3px solid #FFFF00;
+        }
+
+        /* Estrutura Principal da Aplicação */
+        .app-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 1. SEÇÃO INÍCIO (BANNER + BOTÃO DE AJUDA) */
+        .hero-banner {
+            background-color: var(--bg-card);
+            border: 3px solid var(--brand-primary);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .hero-banner h1 {
+            font-size: calc(2.2rem * var(--font-scale));
+            color: var(--brand-primary);
+            margin-bottom: 12px;
+        }
+
+        .hero-banner p {
+            font-size: calc(1.25rem * var(--font-scale));
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Botão de Ajuda Funcional */
+        .help-btn {
+            display: inline-block;
+            background-color: var(--accent-warning);
+            color: #FFFFFF;
+            font-size: calc(1.3rem * var(--font-scale));
+            font-weight: bold;
+            padding: 16px 32px;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .help-btn:hover, .help-btn:focus {
+            transform: scale(1.03);
+            outline: 4px solid #FFFF00;
+        }
+
+        /* Modal de Ajuda acionado via Checkbox CSS */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.75);
+            z-index: 2000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #help-toggle:checked ~ .help-modal {
+            display: flex;
+        }
+
+        .help-modal-content {
+            background-color: var(--bg-card);
+            border: 4px solid var(--accent-warning);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            color: var(--text-primary);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .help-modal-content h2 {
+            color: var(--accent-warning);
+            font-size: calc(1.8rem * var(--font-scale));
+            margin-bottom: 15px;
+        }
+
+        .help-modal-content p {
+            font-size: calc(1.2rem * var(--font-scale));
+            margin-bottom: 15px;
+        }
+
+        .help-contacts {
+            background-color: var(--bg-warning);
+            border: 2px dashed var(--accent-warning);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .help-contacts li {
+            font-size: calc(1.2rem * var(--font-scale));
+            margin-bottom: 8px;
+            list-style: none;
+            font-weight: bold;
+        }
+
+        .close-modal-btn {
+            display: block;
+            background-color: var(--brand-primary);
+            color: #FFFFFF;
+            text-align: center;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: calc(1.2rem * var(--font-scale));
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Menu de Navegação */
+        .category-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .category-btn {
+            display: block;
+            background-color: var(--brand-primary);
+            color: #FFFFFF;
+            text-align: center;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: calc(1.15rem * var(--font-scale));
+            font-weight: bold;
+            text-decoration: none;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #contrast-toggle:checked ~ div.app-wrapper .category-btn {
+            color: #000000;
+            background-color: #FFFF00;
+        }
+
+        .category-btn:hover, .category-btn:focus {
+            background-color: var(--brand-hover);
+            outline: 4px solid #FFA500;
+        }
+
+        /* Estilo Geral de Seções */
+        .content-section {
+            background-color: var(--bg-card);
+            border: 3px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 35px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            scroll-margin-top: 90px;
+        }
+
+        .content-section h2 {
+            font-size: calc(1.8rem * var(--font-scale));
+            color: var(--brand-primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* 2. SEÇÃO: DICAS IMPORTANTES (3 Dicas Curtas) */
+        .simple-tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-box {
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tip-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .tip-box h3 {
+            font-size: calc(1.3rem * var(--font-scale));
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+        }
+
+        .tip-box p {
+            font-size: calc(1.1rem * var(--font-scale));
+            color: var(--text-primary);
+        }
+
+        /* 3. SEÇÃO: DIREITOS NA INTERNET */
+        .rights-text {
+            font-size: calc(1.2rem * var(--font-scale));
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .rights-list {
+            list-style-type: none;
+            margin-top: 15px;
+        }
+
+        .rights-list li {
+            font-size: calc(1.15rem * var(--font-scale));
+            margin-bottom: 12px;
+            padding-left: 35px;
+            position: relative;
+        }
+
+        .rights-list li::before {
+            content: "⚖️";
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+
+        /* 4. SEÇÃO: COMO SABER SE ESTOU CAINDO EM UM GOLPE */
+        .alert-intro {
+            font-size: calc(1.2rem * var(--font-scale));
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--accent-warning);
+        }
+
+        .suspect-signs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sign-item {
+            background-color: var(--bg-warning);
+            border-left: 6px solid var(--accent-warning);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .sign-item h3 {
+            font-size: calc(1.3rem * var(--font-scale));
+            color: var(--accent-warning);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sign-item p {
+            font-size: calc(1.1rem * var(--font-scale));
+            color: var(--text-primary);
+        }
+
+        /* Botão Voltar ao Topo */
+        .top-btn {
+            display: block;
+            text-align: center;
+            margin: 30px auto 10px auto;
+            width: fit-content;
+            background-color: var(--text-secondary);
+            color: #FFFFFF;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: calc(1.1rem * var(--font-scale));
+            font-weight: bold;
+        }
+
+        .top-btn:hover {
+            background-color: var(--text-primary);
+        }
+
+        /* Rodapé */
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: calc(1rem * var(--font-scale));
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Inputs de Controle para Acessibilidade sem JS -->
+    <input type="radio" name="font-size" id="font-normal" class="control-input" checked>
+    <input type="radio" name="font-size" id="font-large" class="control-input">
+    <input type="radio" name="font-size" id="font-xlarge" class="control-input">
+    <input type="checkbox" id="contrast-toggle" class="control-input">
+    <input type="checkbox" id="help-toggle" class="control-input">
+
+    <!-- Barra Superior de Acessibilidade -->
+    <div class="accessibility-bar" role="region" aria-label="Controles de Acessibilidade">
+        <span>Tamanho da Letra:</span>
+        <div class="acc-btn-group">
+            <label for="font-normal" class="acc-btn" title="Tamanho de texto normal">A</label>
+            <label for="font-large" class="acc-btn" title="Tamanho de texto grande">A+</label>
+            <label for="font-xlarge" class="acc-btn" title="Tamanho de texto muito grande">A++</label>
+        </div>
+        <div class="acc-btn-group">
+            <label for="contrast-toggle" class="acc-btn" title="Alternar Alto Contraste">
+                👁️ Alto Contraste
+            </label>
+        </div>
+    </div>
+
+    <!-- Modal de Ajuda Rápida -->
+    <div class="help-modal">
+        <div class="help-modal-content">
+            <h2>🚨 Precisa de Ajuda Agora?</h2>
+            <p>Se você acha que está conversando com um golpista ou fez um pagamento por engano, mantenha a calma e siga estes passos:</p>
+            
+            <ul class="help-contacts">
+                <li>1. Pare de responder as mensagens imediatamente.</li>
+                <li>2. Ligue para seu familiar de confiança pelo telefone normal.</li>
+                <li>3. Ligue para seu Banco pelo número que está atrás do cartão.</li>
+                <li>4. Polícia Militar: <b>Discagem 190</b></li>
+                <li>5. Disque Direitos Humanos: <b>Discagem 100</b></li>
+            </ul>
+
+            <label for="help-toggle" class="close-modal-btn">Entendi / Fechar Janela</label>
+        </div>
+    </div>
+
+    <!-- Container Principal da Aplicação -->
+    <div class="app-wrapper" id="inicio">
+
+        <!-- 1. INÍCIO (BANNER + BOTÃO DE AJUDA) -->
+        <header class="hero-banner">
+            <h1>🛡️ Guia de Segurança Digital</h1>
+            <p>Aprenda a usar a internet e seu celular de forma simples, segura e sem medos.</p>
+            
+            <!-- Botão de Ajuda Funcional -->
+            <label for="help-toggle" class="help-btn">
+                🆘 Botão de Ajuda Urgente
+            </label>
+        </header>
+
+        <!-- MENU DE NAVEGAÇÃO RÁPIDA -->
+        <nav class="category-nav" aria-label="Menu Principal">
+            <a href="#dicas-importantes" class="category-btn">💡 Dicas Importantes</a>
+            <a href="#direitos-internet" class="category-btn">⚖️ Direitos na Internet</a>
+            <a href="#como-saber-golpe" class="category-btn">⚠️ É Golpe? Como Saber</a>
+        </nav>
+
+        <!-- 2. DICAS IMPORTANTES (3 DICAS CURTAS) -->
+        <section id="dicas-importantes" class="content-section">
+            <h2>💡 Dicas Importantes (Curtas e Simples)</h2>
+            
+            <div class="simple-tips-grid">
+                <!-- Dica 1 -->
+                <div class="tip-box">
+                    <span class="tip-icon">🛑</span>
+                    <h3>1. Pare e Pense</h3>
+                    <p>Nunca faça pagamentos ou Pix com pressa. Golpistas usam a urgência para fazer você agir sem raciocinar.</p>
+                </div>
+
+                <!-- Dica 2 -->
+                <div class="tip-box">
+                    <span class="tip-icon">🔒</span>
+                    <h3>2. Guarde o Segredo</h3>
+                    <p>Sua senha e os códigos recebidos por SMS são como a chave da sua casa. Nunca envie para ninguém.</p>
+                </div>
+
+                <!-- Dica 3 -->
+                <div class="tip-box">
+                    <span class="tip-icon">📞</span>
+                    <h3>3. Confirme Ligando</h3>
+                    <p>Se um parente pedir dinheiro por número novo no WhatsApp, ligue no número antigo dele para confirmar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DIREITOS NA INTERNET -->
+        <section id="direitos-internet" class="content-section">
+            <h2>⚖️ Seus Direitos na Internet</h2>
+            <p class="rights-text">
+                Navegar na internet é um direito de todos. Assim como no mundo físico, você possui garantias protegidas por leis brasileiras (como o Marco Civil da Internet e a Lei Geral de Proteção de Dados):
+            </p>
+
+            <ul class="rights-list">
+                <li><b>Direito à Privacidade:</b> Suas conversas, fotos e informações pessoais não podem ser acessadas nem divulgadas sem sua permissão.</li>
+                <li><b>Direito de Proteção de Dados:</b> Empresas e bancos têm a obrigação de cuidar muito bem dos seus dados pessoais e CPF.</li>
+                <li><b>Direito à Segurança nas Compras:</b> Se comprar algo pela internet e se arrepender, você tem o direito garantido por lei de cancelar em até 7 dias.</li>
+                <li><b>Direito de Não Ser Enganado:</b> Propagandas falsas ou enganosas são proibidas por lei no ambiente digital.</li>
+            </ul>
+        </section>
+
+        <!-- 4. COMO SABER SE ESTOU CAINDO EM UM GOLPE? -->
+        <section id="como-saber-golpe" class="content-section">
+            <h2>⚠️ Como Saber se Estou Caindo em um Golpe?</h2>
+            <p class="alert-intro">Fique atento! Se você identificar alguma destas atitudes no seu celular, desconfie na hora:</p>
+
+            <div class="suspect-signs">
+                
+                <div class="sign-item">
+                    <h3>🚨 1. Pressa Excessiva e Apelo Emocional</h3>
+                    <p>O contato diz que é "urgente", que alguém está no hospital ou precisando de dinheiro rápido. Eles tentam deixar você assustado para agir sem pensar.</p>
+                </div>
+
+                <div class="sign-item">
+                    <h3>🚨 2. Pedidos de Códigos por SMS ou Chamada</h3>
+                    <p>Se alguém pedir para você falar ou digitar um código que acabou de chegar por mensagem no celular, <b>é golpe!</b> Esse código dá acesso ao seu WhatsApp.</p>
+                </div>
+
+                <div class="sign-item">
+                    <h3>🚨 3. Prêmios ou Dinheiro "Fácil"</h3>
+                    <p>Mensagens dizendo que você ganhou um grande prêmio, mas precisa fazer um Pix pequeno para "liberar o valor". Nenhum prêmio verdadeiro cobra taxa para entregar o dinheiro.</p>
+                </div>
+
+                <div class="sign-item">
+                    <h3>🚨 4. Links Estranhos e Ofertas Inacreditáveis</h3>
+                    <p>Recebeu um link estranho com letras esquisitas ou promoção barata demais? Não clique. Bancos nunca mandam links por mensagem pedindo senhas.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Botão Voltar ao Topo -->
+        <a href="#inicio" class="top-btn">⬆️ Voltar ao Topo do Guia</a>
+
+        <footer>
+            <p>Guia Acessível de Segurança Digital para Idosos - Desenvolvido em HTML e CSS.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
